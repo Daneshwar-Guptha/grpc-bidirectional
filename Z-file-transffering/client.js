@@ -2,9 +2,9 @@ const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const fs = require("fs");
 const path = require("path");
+const PROTO_PATH = path.join(__dirname,"./proto/file_transfer.proto");
 
-const PROTO_PATH = "./file_transfer.proto";
-const SERVER_ADDRESS = "localhost:50051";
+const SERVER_ADDRESS = "0.0.0.0:50051";
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
