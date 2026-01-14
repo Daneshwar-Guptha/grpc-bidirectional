@@ -16,7 +16,7 @@ func main() {
 	fmt.Print("Enter file name: ")
 	fmt.Scan(&fileName)
 
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.105.54.157:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	outFile, err := os.Create("downloaded_" + fileName)
+	outFile, err := os.Create("downloaded_" + ".js")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,6 +52,7 @@ func main() {
 		}
 
 		n, _ := outFile.Write(resp.Content)
+		
 		total += int64(n)
 		fmt.Println("Downloaded:", total)
 	}

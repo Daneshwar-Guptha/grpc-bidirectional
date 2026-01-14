@@ -15,3 +15,4 @@ message ResponseMessage {
 service MessageService {
   rpc SayHello (RequestMessage) returns (stream ResponseMessage);
 }
+

@@ -14,19 +14,19 @@ type server struct {
 	pb.UnimplementedMessageServiceServer
 }
 
-// IMPORTANT: stream type MUST be MessageService_SayHelloServer
+
 func (s *server) SayHello(
 	req *pb.RequestMessage,
 	stream pb.MessageService_SayHelloServer,
 ) error {
 
-	file, err := os.Open("./files/" + req.GetName())
+	file, err := os.Open("/mnt/c/Users/kdaneshwar/Documents/grpc-demo1/Demo/hello.proto")
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	buffer := make([]byte, 64*1024) // 64KB chunks (large file safe)
+	buffer := make([]byte, 64*1024) 
 
 	for {
 		n, err := file.Read(buffer)
