@@ -67,7 +67,7 @@ func (x *RequestMessage) GetName() string {
 
 type ResponseMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Content       []byte                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -102,11 +102,11 @@ func (*ResponseMessage) Descriptor() ([]byte, []int) {
 	return file_proto_message_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ResponseMessage) GetMessage() string {
+func (x *ResponseMessage) GetContent() []byte {
 	if x != nil {
-		return x.Message
+		return x.Content
 	}
-	return ""
+	return nil
 }
 
 var File_proto_message_proto protoreflect.FileDescriptor
@@ -117,9 +117,9 @@ const file_proto_message_proto_rawDesc = "" +
 	"\x0eRequestMessage\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"+\n" +
 	"\x0fResponseMessage\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2O\n" +
-	"\x0eMessageService\x12=\n" +
-	"\bSayHello\x12\x17.message.RequestMessage\x1a\x18.message.ResponseMessageB\x12Z\x10grpc-go/proto;pbb\x06proto3"
+	"\acontent\x18\x01 \x01(\fR\acontent2Q\n" +
+	"\x0eMessageService\x12?\n" +
+	"\bSayHello\x12\x17.message.RequestMessage\x1a\x18.message.ResponseMessage0\x01B\x12Z\x10grpc-go/proto;pbb\x06proto3"
 
 var (
 	file_proto_message_proto_rawDescOnce sync.Once

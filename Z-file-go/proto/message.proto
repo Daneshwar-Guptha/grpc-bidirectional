@@ -9,9 +9,9 @@ message RequestMessage {
 }
 
 message ResponseMessage {
-  string message = 1;
+  bytes content = 1;
 }
 
 service MessageService {
-  rpc SayHello (RequestMessage) returns (ResponseMessage);
+  rpc SayHello (RequestMessage) returns (stream ResponseMessage);
 }

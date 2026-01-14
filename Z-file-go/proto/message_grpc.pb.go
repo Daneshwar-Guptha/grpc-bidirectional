@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
-	SayHello(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (*ResponseMessage, error)
+	SayHello(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ResponseMessage], error)
 }
 
 type messageServiceClient struct {
@@ -37,21 +37,30 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 	return &messageServiceClient{cc}
 }
 
-func (c *messageServiceClient) SayHello(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (*ResponseMessage, error) {
+func (c *messageServiceClient) SayHello(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ResponseMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ResponseMessage)
-	err := c.cc.Invoke(ctx, MessageService_SayHello_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &MessageService_ServiceDesc.Streams[0], MessageService_SayHello_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[RequestMessage, ResponseMessage]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MessageService_SayHelloClient = grpc.ServerStreamingClient[ResponseMessage]
 
 // MessageServiceServer is the server API for MessageService service.
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility.
 type MessageServiceServer interface {
-	SayHello(context.Context, *RequestMessage) (*ResponseMessage, error)
+	SayHello(*RequestMessage, grpc.ServerStreamingServer[ResponseMessage]) error
 	mustEmbedUnimplementedMessageServiceServer()
 }
 
@@ -62,8 +71,8 @@ type MessageServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMessageServiceServer struct{}
 
-func (UnimplementedMessageServiceServer) SayHello(context.Context, *RequestMessage) (*ResponseMessage, error) {
-	return nil, status.Error(codes.Unimplemented, "method SayHello not implemented")
+func (UnimplementedMessageServiceServer) SayHello(*RequestMessage, grpc.ServerStreamingServer[ResponseMessage]) error {
+	return status.Error(codes.Unimplemented, "method SayHello not implemented")
 }
 func (UnimplementedMessageServiceServer) mustEmbedUnimplementedMessageServiceServer() {}
 func (UnimplementedMessageServiceServer) testEmbeddedByValue()                        {}
@@ -86,23 +95,16 @@ func RegisterMessageServiceServer(s grpc.ServiceRegistrar, srv MessageServiceSer
 	s.RegisterService(&MessageService_ServiceDesc, srv)
 }
 
-func _MessageService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RequestMessage)
-	if err := dec(in); err != nil {
-		return nil, err
+func _MessageService_SayHello_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RequestMessage)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(MessageServiceServer).SayHello(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MessageService_SayHello_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessageServiceServer).SayHello(ctx, req.(*RequestMessage))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(MessageServiceServer).SayHello(m, &grpc.GenericServerStream[RequestMessage, ResponseMessage]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MessageService_SayHelloServer = grpc.ServerStreamingServer[ResponseMessage]
 
 // MessageService_ServiceDesc is the grpc.ServiceDesc for MessageService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -110,12 +112,13 @@ func _MessageService_SayHello_Handler(srv interface{}, ctx context.Context, dec 
 var MessageService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "message.MessageService",
 	HandlerType: (*MessageServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "SayHello",
-			Handler:    _MessageService_SayHello_Handler,
+			StreamName:    "SayHello",
+			Handler:       _MessageService_SayHello_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/message.proto",
 }
