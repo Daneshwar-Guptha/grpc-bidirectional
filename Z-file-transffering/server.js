@@ -7,7 +7,11 @@ const PROTO_PATH = path.join(__dirname, "proto/file_transfer.proto");
 const FILE_PATH = "C:/Users/K Daneshwar guptha/OneDrive/Desktop/JavaScript/Day2/practice.java"; 
 const CHUNK_SIZE = 64 * 1024;
 
-const packageDef = protoLoader.loadSync(PROTO_PATH);
+const packageDef = protoLoader.loadSync(PROTO_PATH,{
+   keepCase: true,
+   longs:String,
+   defaults:true
+});
 const proto = grpc.loadPackageDefinition(packageDef).filetransfer;
 
 function DownloadFile(call) {
