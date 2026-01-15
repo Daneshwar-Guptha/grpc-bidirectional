@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PROTO_PATH = path.join(__dirname, "proto/file_transfer.proto");
-const SERVER_ADDRESS = "0.0.0.0:50051";
+const SERVER_ADDRESS = "192.168.0.229:50051";
 
 const packageDef = protoLoader.loadSync(PROTO_PATH);
 const proto = grpc.loadPackageDefinition(packageDef).filetransfer;
@@ -19,7 +19,7 @@ function downloadFile(fileName, outputFile) {
     grpc.credentials.createInsecure()
   );
 
-  const call = client.DownloadFile({ file_name: fileName, offset:0 });
+  const call = client.DownloadFile({ file_name: "guptha", offset });
   const writeStream = fs.createWriteStream(outputFile, { flags: "a" });
 
   call.on("data", (chunk) => {
