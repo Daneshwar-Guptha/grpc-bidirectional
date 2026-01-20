@@ -15,12 +15,12 @@ const packageDef = protoLoader.loadSync(PROTO_PATH, {
 const proto = grpc.loadPackageDefinition(packageDef).filetransfer;
 
 const client = new proto.FileTransferService(
-  "localhost:50051",
+  "10.18.226.157:50051",
   grpc.credentials.createInsecure()
 );
 
-const DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_files1";
-const SERVER_FOLDER = "/mnt/c/Users/kdaneshwar/Documents/random_files";
+const DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_filesgb";
+const SERVER_FOLDER = "";
 
 
 fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });

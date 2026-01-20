@@ -38,7 +38,7 @@ func main() {
 
 	log.Println("CLIENT Connecting to server")
 
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("10.33.8.157:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func main() {
 	progress := collectProgress(DOWNLOAD_DIR)
 
 	stream, err := client.DownloadFolder(context.Background(), &pb.FolderRequest{
-		FolderPath: "/mnt/c/Users/kdaneshwar/Documents/random_files1gb",
+		FolderPath: "/mnt/c/Users/kdaneshwar/Documents/random_filesgb",
 		Progress:   progress,
 	})
 	if err != nil {
